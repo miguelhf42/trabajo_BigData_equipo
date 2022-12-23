@@ -1,0 +1,806 @@
+---
+title: "Análisis de la Covid-19 en España"
+description: |
+  Trabajo de Big Data en equipo sobre el Covid-19 y su repercusión en España
+author: 
+- name: María Mena Esteban (mames3@alumni.uv.es)    #--
+- name: Miguel Herrero Fuertes (mihefuer@alumni.uv.es)           #--
+- name: Ignacio Manuel Muñoz Ayala (igmuoza@alumni.uv.es)    #--
+date: 2022-12-23                          #--
+categories: [trabajo BigData, Covid]   #--
+image: "./imagenes/COVID19_share.jpg"
+title-block-banner: true #- {true, false, "green","#AA0000"}
+title-block-banner-color: "DCDCDC"    #-"#FFFFFF" 
+toc: true
+toc-location: left
+toc-depth: 3
+smooth-scroll: true
+format: 
+  html:
+    mainfont: serif
+    #backgroundcolor: "#F1F3F4"
+    #embed-resources: true
+    link-external-newwindow: true
+    #css: ./assets/my_css_file.css   #- CUIDADO!!!!
+code-tools: true
+code-link: true
+---
+
+
+```{css, echo = FALSE}
+.columns {display:flex;}
+h1.title {font-size: 40 px;color: #C0DEEE}
+h1 {color:#2292EF; font-size: 30px ;font-family: Arial Black}
+h2{color: #2292EF; font-size: 20px; font-family: Arial}
+
+body { background-color: ###C7D4FA}
+a {color: #C0DEEE;}
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: ;
+    background-color: #C0DEEE;
+    border-color: palered;
+}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > 
+
+```
+
+
+
+## PRESENTACIÓN DEL TRABAJO
+
+
+
+![La covid](https://uniandes.edu.co/sites/default/files/landing-especial-covid-19.jpg)
+
+------------------------------------------------------------------------
+
+## INTRODUCCIÓN
+En el presente trabajo vamos a mostrar asuntos sobre la Covid-19, como son el aumento de la tasa de mortalidad de las diferentes comunidades autónomas, relacionándolo directamente con la disminución de la natalidad de estas y con cómo la situación de la crisis sanitaria ha afectado la salud mental de la población española.
+
+A lo largo del trabajo hablaremos de cuáles han sido las comunidades autónomas más afectadas en los aspectos mencionados anteriormente.
+
+El trabajo se divide en tres partes:
+
+- En la primera parte, hablaremos del número de defunciones totales que ha habido en el país en 2020 y lo compararemos con el porcentaje que le corresponden a las ocasionadas por el virus.
+
+- En la segunda parte, analizaremos la disminución de la tasa de natalidad durante la pandemia, teniendo en cuenta la situación de país envejecido en la que se encontraba España ya previamente a la pandemia.
+
+- Y por último, comentaremos cómo el estado de alarma y las restricciones provocaron problemas en la salud mental de la población. Analizaremos el número de suicidios que hubo en ese año por comunidades, haciendo una distinción entre hombres y mujeres.
+
+```{r, echo = FALSE, out.width = "60%"}
+library("vembedr")
+embed_url("https://youtu.be/5lcBJtFKWFk")
+```
+
+
+## DATOS
+
+Los datos del trabajo han sido extraídos del INE, y hemos trabajado con ellos en formato csv.
+
+
+## MORTALIDAD EN 2020
+
+La covid afectó a la vida de la gente, no solo en las muertes que han sido provocadas por la enfermedad, que no son pocas, sino por las defunciones que se derivaron indirectamente. La pandemia afectó a España de formas distintas, hubo Comunidades autónomas que se vieron mucho más afectadas como Madrid, esto pudo ser debido a la cantidad de visitantes que recibió por estas fechas, ya fuese por turismo, viajes de negocios, muchas personas viajan y viven en Madrid, por lo que se pudieron producir más contagios por esta causa. Luego nos encontramos con otras Comunidades como la de Canarias que fue la menos afectada de España (quitando las ciudades autónomas de Ceuta y Melilla).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49870.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/causadefun.csv")
+causadefun <- rio::import("./pruebas/causadefun.csv")
+
+library(tidyverse)
+library(gt)
+
+a<- causadefun %>% filter(Edad=="Total", Sexo=="Total")
+a$'Covid-19'[2] <- "covid"
+a$'Covid-19'[6] <- "covid"
+a$'Covid-19'[10] <- "covid"
+a$'Covid-19'[14] <- "covid"
+a$'Covid-19'[18] <- "covid"
+a$'Covid-19'[22] <- "covid"
+a$'Covid-19'[26] <- "covid"
+a$'Covid-19'[30] <- "covid"
+a$'Covid-19'[34] <- "covid"
+a$'Covid-19'[38] <- "covid"
+a$'Covid-19'[42] <- "covid"
+a$'Covid-19'[46] <- "covid"
+a$'Covid-19'[50] <- "covid"
+a$'Covid-19'[54] <- "covid"
+a$'Covid-19'[58] <- "covid"
+a$'Covid-19'[62] <- "covid"
+a$'Covid-19'[66] <- "covid"
+a$'Covid-19'[70] <- "covid"
+a$'Covid-19'[74] <- "covid"
+a$'Covid-19'[78] <- "covid"
+colnames(a)[3] <- "Covid"
+a_b <-a %>% filter(Covid=="covid") %>% slice(c(2:20)) 
+datos_ordenados <- arrange(a, desc(Total))
+
+
+colnames(a_b)[2] <- "Comunidades autónomas"
+
+tabla_def <- a_b %>% select('Comunidades autónomas', Total)
+
+tabla_max <- tabla_def %>% slice(13) 
+tabla_max$'Comunidades autónomas'[1] <- "Comunidad de Madrid"
+
+Bandera <- "https://todosobremadrid.com/wp-content/uploads/2016/06/01-Bandera-CAM.jpg"
+
+dftop1 <- tabla_max %>% add_column(Bandera)
+
+Tabla_Pmascal <- dftop1 %>% gt()
+
+Tabla_Pmascal <- Tabla_Pmascal %>%
+  tab_header(title = md("**Comunidad con más defunciones (Covid)**"))
+
+Tabla_Pmascal <- Tabla_Pmascal %>%
+  tab_options(heading.background.color = "#df1c44") %>% tab_options(heading.title.font.size = 15,  column_labels.font.weight =  "bold")
+
+
+Tabla_Pmascal <- Tabla_Pmascal  %>%
+  gt::text_transform(locations = cells_body(columns = c(Bandera)), fn = function(x) {gt::web_image(x, height = 50)}) %>%  cols_align(
+    align = "center")
+
+Tabla_Pmascal
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#| label: names
+#| echo: true
+#| eval: false
+
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49870.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/causadefun.csv")
+causadefun <- rio::import("./pruebas/causadefun.csv")
+
+library(tidyverse)
+library(gt)
+
+a<- causadefun %>% filter(Edad=="Total", Sexo=="Total")
+a$'Covid-19'[2] <- "covid"
+a$'Covid-19'[6] <- "covid"
+a$'Covid-19'[10] <- "covid"
+a$'Covid-19'[14] <- "covid"
+a$'Covid-19'[18] <- "covid"
+a$'Covid-19'[22] <- "covid"
+a$'Covid-19'[26] <- "covid"
+a$'Covid-19'[30] <- "covid"
+a$'Covid-19'[34] <- "covid"
+a$'Covid-19'[38] <- "covid"
+a$'Covid-19'[42] <- "covid"
+a$'Covid-19'[46] <- "covid"
+a$'Covid-19'[50] <- "covid"
+a$'Covid-19'[54] <- "covid"
+a$'Covid-19'[58] <- "covid"
+a$'Covid-19'[62] <- "covid"
+a$'Covid-19'[66] <- "covid"
+a$'Covid-19'[70] <- "covid"
+a$'Covid-19'[74] <- "covid"
+a$'Covid-19'[78] <- "covid"
+colnames(a)[3] <- "Covid"
+a_b <-a %>% filter(Covid=="covid") %>% slice(c(2:20)) 
+datos_ordenados <- arrange(a, desc(Total))
+
+
+colnames(a_b)[2] <- "Comunidades autónomas"
+
+tabla_def <- a_b %>% select('Comunidades autónomas', Total)
+
+tabla_min <- tabla_def %>%  slice(5)
+
+
+
+
+
+Bandera <- "https://upload.wikimedia.org/wikipedia/commons/b/b0/Flag_of_the_Canary_Islands.svg"
+
+dftop1 <- tabla_min %>% add_column(Bandera)
+
+Tabla_Pmascal <- dftop1 %>% gt()
+
+Tabla_Pmascal <- Tabla_Pmascal %>%
+  tab_header(title = md("**Comunidad con menos defunciones (Covid)**"))
+
+Tabla_Pmascal <- Tabla_Pmascal %>%
+  tab_options(heading.background.color = "#194a8d") %>% tab_options(heading.title.font.size = 15,  column_labels.font.weight =  "bold")
+
+
+Tabla_Pmascal <- Tabla_Pmascal  %>%
+  gt::text_transform(locations = cells_body(columns = c(Bandera)), fn = function(x) {gt::web_image(x, height = 50)}) %>%  cols_align(
+    align = "center")
+
+Tabla_Pmascal
+
+
+
+
+```
+
+En cuanto al país entero, podemos ver como los más mortalidad tuvieron por la Covid fueron Cataluña, Andalucía y Madrid los que más muertes tuvieron sumando todas las causas, puede ser debido a la cantidad de población que vive en esas Comunidades, opuestamente las que menos muertes sufrieron fueron La Rioja, Cantabria y Navarra, puede deberse a que no hay tanta densidad de población junta.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+library(tidyverse)
+library(sf)
+library(tmap)
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49870.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/causadefun.csv")
+causadefun <- rio::import("./pruebas/causadefun.csv")
+
+
+causadefun <- read_delim("pruebas/causadefun.csv", 
+                         delim = "\t", escape_double = FALSE, 
+                         col_types = cols(Total = col_number()),  
+                         locale = locale(date_names = "es", decimal_mark = ",", grouping_mark = "."), 
+                         trim_ws = TRUE)
+
+df <- janitor::clean_names(causadefun)
+df <- df %>% rename(ine_ccaa.n = comunidades_y_ciudades_autonomas)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+#- poner codigo de CCAA
+#- h de ver q se llaman igual
+zz <- df %>% distinct(ine_ccaa.n) %>% filter(!is.na(ine_ccaa.n)) 
+codigos <- pjpv.curso.R.2022::ine_pob_prov_1996_2021 %>% distinct(ine_ccaa, ine_ccaa.n)
+zz <- full_join(codigos, zz)
+#- ok tienen los mismo nombres, asi q fusiono
+df <- full_join(df, codigos)
+
+
+df <- df %>% 
+  mutate(ine_ccaa.n = ifelse(is.na(ine_ccaa.n), "Total", ine_ccaa.n)) %>% 
+  mutate(ine_ccaa = ifelse(is.na(ine_ccaa), "00", ine_ccaa))  %>% 
+  select(-nacional) %>% 
+  relocate(ine_ccaa, .after = ine_ccaa.n)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+df <- df %>% mutate(covid_19 = case_when(
+  covid_19 == "Total" ~ "total",
+  covid_19 == "Covid-19 Virus identificado" ~ "covid_identif",
+  covid_19 == "Covid-19 Virus no identificado (sospechoso)" ~ "covid_no_identif",
+  covid_19 == "Otras causas" ~ "otras_causas"))
+
+
+df_wide <- df %>% pivot_wider(names_from = covid_19, values_from = total) 
+
+df_new <- df_wide %>% filter(edad == "Total", sexo == "Total") %>% select(-c(covid_no_identif, otras_causas, edad, sexo, ine_ccaa))
+
+df_new %>%
+  tibble::as_tibble() %>%
+  DT::datatable(filter = 'top', options = list(pageLength = 7, autoWidth = TRUE))
+
+```
+
+Aquí se puede apreciar las muertes totales por densidad en el mapa.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#| code-fold: true
+#| label: names
+#| echo: true
+#| eval: false
+#| warning: false
+library(tidyverse)
+library(tmap)
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49870.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/causadefun.csv")
+causadefun <- rio::import("./pruebas/causadefun.csv")
+
+
+causadefun <- read_delim("pruebas/causadefun.csv", 
+                         delim = "\t", escape_double = FALSE, 
+                         col_types = cols(Total = col_number()),  
+                         locale = locale(date_names = "es", decimal_mark = ",", grouping_mark = "."), 
+                         trim_ws = TRUE)
+
+
+df <- janitor::clean_names(causadefun)
+df <- df %>% rename(ine_ccaa.n = comunidades_y_ciudades_autonomas)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+#- poner codigo de CCAA
+#- h de ver q se llaman igual
+zz <- df %>% distinct(ine_ccaa.n) %>% filter(!is.na(ine_ccaa.n)) 
+codigos <- pjpv.curso.R.2022::ine_pob_prov_1996_2021 %>% distinct(ine_ccaa, ine_ccaa.n)
+zz <- full_join(codigos, zz)
+#- ok tienen los mismo nombres, asi q fusiono
+df <- full_join(df, codigos)
+
+
+df <- df %>% 
+  mutate(ine_ccaa.n = ifelse(is.na(ine_ccaa.n), "Total", ine_ccaa.n)) %>% 
+  mutate(ine_ccaa = ifelse(is.na(ine_ccaa), "00", ine_ccaa))  %>% 
+  select(-nacional) %>% 
+  relocate(ine_ccaa, .after = ine_ccaa.n)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+df <- df %>% mutate(covid_19 = case_when(
+  covid_19 == "Total" ~ "total",
+  covid_19 == "Covid-19 Virus identificado" ~ "covid_identif",
+  covid_19 == "Covid-19 Virus no identificado (sospechoso)" ~ "covid_no_identif",
+  covid_19 == "Otras causas" ~ "otras_causas"))
+
+
+
+df_wide <- df %>% pivot_wider(names_from = covid_19, values_from = total) 
+
+df_new <- df_wide %>% filter(edad == "Total", sexo == "Total") 
+
+
+#- cargo geometrías de provincias
+df_geo_prov <- pjpv.curso.R.2022::LAU2_prov_2020_canarias
+
+
+
+
+#- me quedo con las vv. q me interesan
+df_geo_prov <- df_geo_prov %>% select(ine_prov, ine_prov.n, ine_ccaa, ine_ccaa.n)
+
+
+#- podemos "agregar" geometrías
+df_geo_ccaa <- df_geo_prov %>% 
+  group_by(ine_ccaa, ine_ccaa.n) %>% summarize() %>% ungroup()
+
+
+# df_geo_esp <- df_geo_ccaa %>% group_by(1) %>% summarise()
+# plot(df_geo_esp, max.plot = 1)
+
+
+#- junto geometría (df_geo_ccaa) con datos INE (df_ccaa_2021)
+#- las geometrías a la izquierda
+
+#mapa escalas
+
+df_ok <- left_join(df_geo_ccaa, df_new, by = c("ine_ccaa" = "ine_ccaa"))
+
+
+p <- ggplot() + geom_sf(data = df_ok, 
+          aes(geometry = geometry, fill = total), 
+          color = "white", size = 0.09)  + scale_fill_distiller(palette = 2) + pjpv.curso.R.2022::theme_pjp_maps() + scale_fill_viridis_c(option = "plasma") + pjpv.curso.R.2022::theme_pjp_maps() +
+  labs(title = "Escala defunciones según la CCAA", caption = "Datos provenientes del INE")
+
+p
+```
+
+Y aquí el mapa de las defunciones totales.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#| label: names
+#| echo: true
+#| eval: false
+#| warning: false
+
+library(tidyverse)
+library(sf)
+library(tmap)
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49870.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/causadefun.csv")
+causadefun <- rio::import("./pruebas/causadefun.csv")
+
+
+causadefun <- read_delim("pruebas/causadefun.csv", 
+                         delim = "\t", escape_double = FALSE, 
+                         col_types = cols(Total = col_number()),  
+                         locale = locale(date_names = "es", decimal_mark = ",", grouping_mark = "."), 
+                         trim_ws = TRUE)
+
+
+df <- janitor::clean_names(causadefun)
+df <- df %>% rename(ine_ccaa.n = comunidades_y_ciudades_autonomas)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+#- poner codigo de CCAA
+#- h de ver q se llaman igual
+zz <- df %>% distinct(ine_ccaa.n) %>% filter(!is.na(ine_ccaa.n)) 
+codigos <- pjpv.curso.R.2022::ine_pob_prov_1996_2021 %>% distinct(ine_ccaa, ine_ccaa.n)
+zz <- full_join(codigos, zz)
+#- ok tienen los mismo nombres, asi q fusiono
+df <- full_join(df, codigos)
+
+
+df <- df %>% 
+  mutate(ine_ccaa.n = ifelse(is.na(ine_ccaa.n), "Total", ine_ccaa.n)) %>% 
+  mutate(ine_ccaa = ifelse(is.na(ine_ccaa), "00", ine_ccaa))  %>% 
+  select(-nacional) %>% 
+  relocate(ine_ccaa, .after = ine_ccaa.n)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(df)
+
+df <- df %>% mutate(covid_19 = case_when(
+  covid_19 == "Total" ~ "total",
+  covid_19 == "Covid-19 Virus identificado" ~ "covid_identif",
+  covid_19 == "Covid-19 Virus no identificado (sospechoso)" ~ "covid_no_identif",
+  covid_19 == "Otras causas" ~ "otras_causas"))
+
+
+
+df_wide <- df %>% pivot_wider(names_from = covid_19, values_from = total) 
+
+df_new <- df_wide %>% filter(edad == "Total", sexo == "Total") 
+
+
+#- cargo geometrías de provincias
+df_geo_prov <- pjpv.curso.R.2022::LAU2_prov_2020_canarias
+
+
+#- podemos ver q la última columna de df_geo_prov tiene las "geometrías"
+
+
+#- me quedo con las vv. q me interesan
+df_geo_prov <- df_geo_prov %>% select(ine_prov, ine_prov.n, ine_ccaa, ine_ccaa.n)
+
+
+#- podemos "agregar" geometrías
+df_geo_ccaa <- df_geo_prov %>% 
+  group_by(ine_ccaa, ine_ccaa.n) %>% summarize() %>% ungroup()
+
+
+
+# df_geo_esp <- df_geo_ccaa %>% group_by(1) %>% summarise()
+# plot(df_geo_esp, max.plot = 1)
+
+
+#- junto geometría (df_geo_ccaa) con datos INE (df_ccaa_2021)
+#- las geometrías a la izquierda
+
+
+df_geo_ccaa <- cbind(df_geo_ccaa, st_coordinates(st_centroid(df_geo_ccaa$geometry)))
+
+#- vuelvo a juntar datos EPA con geometrías (q ahora incorporan los centroides)
+df_ok <- left_join(df_geo_ccaa, df_new, by = c("ine_ccaa" = "ine_ccaa"))
+
+#mapa defunciones con total
+
+p <- ggplot() + 
+  geom_sf(data = df_ok, 
+          aes(geometry = geometry), fill = "antiquewhite", 
+          color = "black", size = 0.09) +
+  geom_text(data = df_ok, aes(x = X, y = Y, label = total), 
+            color = "black",  
+            check_overlap = TRUE, size = 3) + labs(title = "Número defunciones según la CCAA", 
+       
+       caption = "Datos provenientes del INE")
+
+p
+```
+
+
+## CÓMO HA AFECTADO LA PANDEMIA DE LA COVID-19 A LA NATALIDAD 
+
+En este punto vamos a analizar cómo ha afectado la pandemia de la covid-19 a la natalidad del país.
+Poniendo en contexto la situación vivida antes de la covid, sabemos que desde el año 2000, España es un país envejecido, esto significa que existe más población de avanzada edad que jóven.
+Si analizamos las tasas de natalidad en los 22 países con mayor renta per cápita y nivel de vida observamos como los nacimientos por la crisis económica han disminuido, especialmente en los países del sur de Europa como Italia y España.
+La diferencia entre los países reside en los meses de confinamiento de cada uno y las etapas en las que el virus afectó más.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+my_url <- "https://www.ine.es/jaxiT3/files/t/es/csv_bd/46678.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/nacimientos.csv")
+nacimientos <- rio::import("./pruebas/nacimientos.csv")
+nacimientos <- janitor::clean_names(nacimientos)
+
+zz <- pjpv.curso.R.2022::pjp_estadisticos_basicos(nacimientos)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+#- 
+nacimientos <- nacimientos %>% 
+  mutate(total = parse_number(total, locale = locale(decimal_mark = "," , grouping_mark = ".")), .after = total) %>% 
+  mutate(total = as.numeric(total))
+
+
+#- 
+nacimientos <- nacimientos %>% rename(CCAA = comunidades_y_ciudades_autonomas)
+nacimientos <- nacimientos %>% mutate(CCAA = ifelse(CCAA == "", "00 Nacional", CCAA)) %>% 
+  select(-total_nacional)
+
+#- 
+nacimientos <- nacimientos %>% separate(CCAA, sep = " ", into = c("ine_ccaa", "ine.ccaa.n"), extra = "merge")
+
+nacimientos <- nacimientos %>% 
+  mutate(fecha = lubridate::ym(periodo), .after = periodo) %>% 
+  mutate(year = lubridate::year(fecha), .after = fecha) %>% 
+  mutate(mes = lubridate::month(fecha), .after = year) %>%
+  select(-periodo)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+
+nacimientos <- nacimientos %>% mutate(tipo_de_dato = case_when(
+  tipo_de_dato == "Dato base" ~ "numero",
+  tipo_de_dato == "Acumulado en lo que va de año" ~ "numero_acu",
+  tipo_de_dato == "Variación anual del acumulado en lo que va de año" ~ "var_anu_acu",
+  TRUE ~ "var_acu_respecto_19"))
+
+df <- nacimientos
+
+
+df_wide <- df %>% 
+  pivot_wider(names_from = tipo_de_dato, values_from = total) 
+
+#- ver si esta ok
+zz <- df_wide %>% filter(ine_ccaa == "00") %>% 
+  filter(edad_de_la_madre == "Todas las edades") %>% 
+  arrange(year, mes)
+
+
+df_new <- df_wide %>% select( ine.ccaa.n, fecha, numero) %>% slice(-c(1:81))
+df_new_1 <- df_new %>% slice(-c(1:739))
+colnames(df_new_1)[1] <- "Comunidades autónomas"
+
+colnames(df_new_1)[3] <- "Total nacimientos"
+
+library(DT)
+datatable(df_new_1)
+
+
+
+
+
+```
+
+
+
+
+Cada vez nacen menos niños en España y esta tendencia descendente de la natalidad se ha visto agudizada por causa de la pandemia. Este fenómeno lo podemos explicar en base a dos supuestos, el primero es una mezcla de la tendencia de caída de la fecundidad que España registra desde los años setenta y el segundo es el aplazamiento de la decisión de tener hijos con motivo a la crisis sanitaria del coronavirus que ha provocado gran incertidumbre económica.
+En las situaciones de inestabilidad económica las parejas deciden tener menos hijos, este hecho es constatable en las dos crisis hasta ahora vividas en el SXXI, la crisis financiera de 2008 y la reciente pandemia de 2020. Tener hijos es muy costoso y forma parte de una estratégia de planificación a largo plazo. En los países nórdicos la protección social por desempleo es más fuerte que en los países del sur de Europa, por eso la la gente se ha animado más a tener hijos.
+Atendiendo a la gráfica de España por comunidades podemos ver como Andalucía es la comunidad con más nacimientos y las ciudades autónomas de Ceuta y Melilla son las de que menos tasas de natalidad han registrado.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+my_url <- "https://www.ine.es/jaxiT3/files/t/es/csv_bd/46678.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/nacimientos.csv")
+nacimientos <- rio::import("./pruebas/nacimientos.csv")
+nacimientos <- janitor::clean_names(nacimientos)
+
+zz <- pjpv.curso.R.2022::pjp_estadisticos_basicos(nacimientos)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+#- 
+nacimientos <- nacimientos %>% 
+  mutate(total = parse_number(total, locale = locale(decimal_mark = "," , grouping_mark = ".")), .after = total) %>% 
+  mutate(total = as.numeric(total))
+
+
+#- 
+nacimientos <- nacimientos %>% rename(CCAA = comunidades_y_ciudades_autonomas)
+nacimientos <- nacimientos %>% mutate(CCAA = ifelse(CCAA == "", "00 Nacional", CCAA)) %>% 
+  select(-total_nacional)
+
+#- 
+nacimientos <- nacimientos %>% separate(CCAA, sep = " ", into = c("ine_ccaa", "ine.ccaa.n"), extra = "merge")
+
+nacimientos <- nacimientos %>% 
+  mutate(fecha = lubridate::ym(periodo), .after = periodo) %>% 
+  mutate(year = lubridate::year(fecha), .after = fecha) %>% 
+  mutate(mes = lubridate::month(fecha), .after = year) %>%
+  select(-periodo)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+
+nacimientos <- nacimientos %>% mutate(tipo_de_dato = case_when(
+  tipo_de_dato == "Dato base" ~ "numero",
+  tipo_de_dato == "Acumulado en lo que va de año" ~ "numero_acu",
+  tipo_de_dato == "Variación anual del acumulado en lo que va de año" ~ "var_anu_acu",
+  TRUE ~ "var_acu_respecto_19"))
+
+df <- nacimientos
+
+
+df_wide <- df %>% 
+  pivot_wider(names_from = tipo_de_dato, values_from = total) 
+
+#- ver si esta ok
+zz <- df_wide %>% filter(ine_ccaa == "00") %>% 
+  filter(edad_de_la_madre == "Todas las edades") %>% 
+  arrange(year, mes)
+
+
+df_new <- df_wide %>% select(ine_ccaa, ine.ccaa.n, edad_de_la_madre, fecha, numero) %>% filter(edad_de_la_madre== "Todas las edades") %>% slice(-c(1:81))
+
+
+
+
+library(ggplot2)
+library(ggthemes)
+library(gganimate)
+
+df_new <- df_new %>% dplyr::rename("Comunidades"="ine.ccaa.n")
+
+grafico <- ggplot()
+df_new <- df_new %>% slice(-c(1))
+ggplot(df_new) +  geom_col(aes(numero,Comunidades,fill=fecha))+ theme_minimal() + labs(title = "Nacimientos por Covid-19 según CCAA",
+                                                                          subtitle = "Datos del INE, periodo 2019-2022 - Fecha: {frame_time}",
+                                                                          x= "Número nacimientos totales",
+                                                                          y= "CCAA") +transition_time(fecha)
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+ my_url <- "https://www.ine.es/jaxiT3/files/t/es/csv_bd/46678.csv?nocab=1"
+ curl::curl_download(my_url, "./pruebas/nacimientos.csv")
+nacimientos <- rio::import("./pruebas/nacimientos.csv")
+nacimientos <- janitor::clean_names(nacimientos)
+
+zz <- pjpv.curso.R.2022::pjp_estadisticos_basicos(nacimientos)
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+#- 
+nacimientos <- nacimientos %>% 
+  mutate(total = parse_number(total, locale = locale(decimal_mark = "," , grouping_mark = ".")), .after = total) %>% 
+  mutate(total = as.numeric(total))
+                                        
+
+#- 
+nacimientos <- nacimientos %>% rename(CCAA = comunidades_y_ciudades_autonomas)
+nacimientos <- nacimientos %>% mutate(CCAA = ifelse(CCAA == "", "00 Nacional", CCAA)) %>% 
+  select(-total_nacional)
+
+#- 
+nacimientos <- nacimientos %>% separate(CCAA, sep = " ", into = c("ine_ccaa", "ine.ccaa.n"), extra = "merge")
+
+nacimientos <- nacimientos %>% 
+  mutate(fecha = lubridate::ym(periodo), .after = periodo) %>% 
+  mutate(year = lubridate::year(fecha), .after = fecha) %>% 
+  mutate(mes = lubridate::month(fecha), .after = year) %>%
+  select(-periodo)
+
+zz <- pjpv.curso.R.2022::pjp_valores_unicos(nacimientos)
+
+
+nacimientos <- nacimientos %>% mutate(tipo_de_dato = case_when(
+  tipo_de_dato == "Dato base" ~ "numero",
+  tipo_de_dato == "Acumulado en lo que va de año" ~ "numero_acu",
+  tipo_de_dato == "Variación anual del acumulado en lo que va de año" ~ "var_anu_acu",
+  TRUE ~ "var_acu_respecto_19"))
+
+df <- nacimientos
+
+
+df_wide <- df %>% 
+  pivot_wider(names_from = tipo_de_dato, values_from = total) 
+
+#- ver si esta ok
+zz <- df_wide %>% filter(ine_ccaa == "00") %>% 
+  filter(edad_de_la_madre == "Todas las edades") %>% 
+  arrange(year, mes)
+
+
+df_new <- df_wide %>% select(ine_ccaa, ine.ccaa.n, edad_de_la_madre, fecha, numero) %>% filter(edad_de_la_madre== "Todas las edades") %>% slice(-c(1:81))
+
+
+
+
+library(ggplot2)
+library(ggthemes)
+library(gganimate)
+
+df_new <- df_new %>% slice(-c(1))
+
+
+df_new <- df_new %>% dplyr::rename("Comunidades"="ine.ccaa.n")
+
+df_new %>% ggplot(aes(x = fecha, y = numero, color = Comunidades)) + geom_line() + labs(title = "Nacimientos (2016-2022)", caption ="Fuente: INE", x = "Fecha", y = "Nacimientos") +  theme(legend.position = "right") + transition_reveal(fecha)
+  
+  
+  
+
+
+
+```
+
+## SALUD MENTAL A LO LARGO DE LA PANDEMIA
+
+Ahora vamos a ver cómo ha afectado la pandemia de la Covid-19 a la salud mental en España.
+
+La salud mental es un tema para tener en cuenta, que cada vez está teniendo una mayor relevancia en nuestra sociedad. En la pandemia la salud mental de muchas personas se vio afectada según los profesionales; los confinamientos, la falta de cercanía, de celebraciones y tal vez no ver a nuestros seres más queridos hayan sido algunos factores que haya en ello.  
+
+Esto se ha visto reflejado en la tasa de suicidios durante este periodo de pandemia, que han aumentado de una manera nunca vista en el país, como vemos en los siguientes gráficos:
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+
+#descargamos la tabla del INE de los suicidos por años
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+df_suicidios2 <- rio::import("./pruebas/datos_suicidios_2.csv")
+
+#ahora vamos a arreglar los datos
+
+df_ss2 <- janitor::clean_names(df_suicidios2) 
+
+df_ss3 <- df_ss2 %>% select(-c("periodo")) %>% slice(c(21:42))
+
+#lo vemos
+library(ggplot2)
+library(ggthemes)
+
+
+ggplot(df_ss3, aes(x = ano , y = total)) +  geom_point(color="dark blue") + geom_line(color="orange") + labs(title="Suicidios por años",subtitle = "(Datos tomados en miles)" ,caption="Fuente: Epdata", x="Años", y="Total") +  theme_economist()
+
+
+
+```
+
+En este gráfico podemos ver cómo ha ido evolucionando el número de suicidios a lo largo de los últimos años. Se puede apreciar como en los años anteriores a la pandemia el número de suicidios estaba en descenso, pero que una vez empezada la pandemia, las restricciones y los confinamientos, este número aumentó bruscamente, llegando a números nunca alcanzados en este siglo.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+#descargamos la tabla del INE de los suicidos 
+fs::dir_create("pruebas") #- primero creamos la carpeta "pruebas"
+my_url <- "https://ine.es/jaxi/files/tpx/es/csv_bd/49956.csv?nocab=1"
+curl::curl_download(my_url, "./pruebas/suicidios.csv")
+df_suicidios <- rio::import("./pruebas/suicidios.csv")
+
+#ahora vamos a arreglar los datos
+
+df_ss <- janitor::clean_names(df_suicidios) 
+
+df_ss <- df_ss %>% dplyr::rename(numero_total_suicidios_por_comunidad = total)
+
+# seleccionamos filters
+suicidios_mod <- df_ss %>% filter(edad =="Todas las edades") %>% select(-nacional) %>% arrange(desc(numero_total_suicidios_por_comunidad)) 
+
+suicidios_mod_1 <- suicidios_mod %>% slice(-c(45:46, 57,59:61))
+
+
+
+# hacemos las gráficas
+graficas_comunidades <- ggplot(suicidios_mod_1, aes(x =numero_total_suicidios_por_comunidad , y= comunidades_y_ciudades_autonomas)) +  geom_bar(stat = "identity" , fill = "blue") +  facet_wrap(vars(sexo)) +  theme_light() 
+
+
+
+
+# resaltamos la Comunidad Valenciana
+comunidad_valenciana <- suicidios_mod_1 %>% filter(comunidades_y_ciudades_autonomas %in% c("Comunitat Valenciana"))
+
+
+graficas_comunidad_valenciana <- graficas_comunidades + geom_bar(data = comunidad_valenciana, aes(x = numero_total_suicidios_por_comunidad, y = comunidades_y_ciudades_autonomas), stat = "identity", fill = "orange") + labs(title = "Suicidios en la pandemia", caption = "Fuente: INE",x="Número de suicidios", y="Comunidades autónomas")
+
+graficas_comunidad_valenciana
+
+
+```
+
+En estos gráficos podemos apreciar la diferencia del número de suicidios entre las diferentes comunidades autónomas de España en el año 2021 (año completamente afectado por la pandemia).
+
+Las comunidades en las que más suicidios se han producido en este año han sido Andalucía y Cataluña, la Comunidad Valenciana está en tercera posición. Destacan también comunidades como La Rioja, Cantabria y Navarra (obviando a Ceuta y Melilla), en las cuales se producen menos suicidios que en el resto, aunque esto se puede deber a que tienen una población menor que otras comunidades.
+
+También destaca que el número de suicidios entre los hombres es considerablemente mayor que el de las mujeres.
+
+
+
+## CONCLUSIÓN
+
+Para finalizar con el tema expuesto, hemos de decir que analizando los datos extraídos nos damos cuenta de los terribles años que nos ha tocado sufrir en nuestro país (y en el resto del mundo), nunca pensamos que nos tocaría vivir una pandemia como la ocurrida, la cual nos ha dejado innumerables secuelas como las que hemos visto en cuanto al aumento del número de defunciones y al efecto que ha tenido en nuestra salud mental.
+
+No obstante, tenemos algunos buenos recuerdos de todo ello como fueron los ratos que salíamos a aplaudir a los sanitarios por su gran esfuerzo, o las videollamadas con familiares y amigos jugando a juegos y pasando buenos ratos. Lo más importante es que estando todos juntos hemos acabado superando esta etapa de nuestras vidas.
+
+
+
+vemos que las comunidades autónomas donde se han producido más muertes son Cataluña, Madrid y Andalucía. Seguidamente, hemos podido comprobar a lo largo del análisis que los nacimientos disminuyeron con la pandemia, a la vez que aumentaron los suicidios.
+
+
+
+
+![Felices fiestas](https://th.bing.com/th/id/OIP.PGo8mxHXZPwz8XSEuBHCWgHaEJ?w=312&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7)
+
+

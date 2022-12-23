@@ -1,0 +1,24 @@
+---
+title: "Análisis de la Covid-19 en España"
+---
+
+
+
+
+Hola, somos Ignacio Manuel Muñoz Ayala, Miguel Herrero Fuertes y María Mena Esteban.
+
+      
+Esta web sirve para presentar el trabajo en equipo para la asignatura "Programación y manejo de datos en la era Del Big Data", optativa de GECO en la Facultad de Economía de la Universitat de València.
+
+La web de la asignatura está [aquí](https://perezp44.github.io/intro-ds-22-23-web/){target="_blank"} y los trabajos de mis compañeros de curso puedes verlos [aquí](https://perezp44.github.io/intro-ds-22-23-web/07-trabajos_2022-23.html){target="_blank"}.
+
+
+Nuestro trabajo lleva por título : “Análisis de la Covid-19 en España”. El objetivo es realizar un estudio sobre qué comunidades se vieron más afectadas por la pandemia y relacionarlo con otros efectos colaterales de la crisis sanitaria como son la disminución de la natalidad y los efectos que ha tenido el estado de alarma sobre la salud mental de la población.
+
+
+El trabajo puede verse [aquí](my_trabajo_BigData.html).
+
+
+
+
+Las transparencias para presentar el **trabajo en grupo** están [aquí](diapos.qmd){target="_blank"}.

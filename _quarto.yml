@@ -1,0 +1,81 @@
+project:                
+  type: website          
+  output-dir: docs        #- NO TOCAR: carpeta donde se redirige el output
+  
+website:
+  title: "Análisis de la Covid-19 en España"     #- hay q cambiarlo
+  favicon: foto.jpeg           #- pon tu favicon
+  # site-url: https://....               #- hay que rellenarlos ()
+  # repo-url: https://....
+  # repo-actions: [edit, issue]
+  search:   
+    location: navbar
+    type: overlay   
+    copy-button: true
+  navbar:
+    logo: "foto.jpeg"           #---
+    #background: "#444444"    #- color de la navbar
+    #foreground: "#FF0000"    #- color navigation elements, text and links that appear in the navbar.
+    left: 
+      - icon: house-door
+        href: index.html
+    right:
+      - text: "Trabajo en equipo"   #---
+        href: definitivo.qmd
+      - text: "Slides"
+        href: diapos.qmd
+      - icon: github
+        href: https://github.com/<tu-usuario-github>    #---
+      - icon: twitter
+        href: https://twitter.com/<tu-usuario-twitter>  #---
+      - icon: envelope
+        url: "mailto:<tu-mail@alumni.uv.es>"            #---
+  page-footer:
+    border: true
+    background: "#e66b63"         #--
+    left: ""   #--
+    center: "Hecho con [Quarto](https://quarto.org)"
+    right:
+      - icon: github
+        href: https://github.com/<tu-usuario-github>    #----
+      - icon: twitter
+        href: https://twitter.com/<tu-usuario-twitter>  #-----
+      - icon: envelope
+        url: "mailto:<tu-mail>@alumni.uv.es"            #-----
+    
+format:
+  html:
+    theme: flatly           #- https://quarto.org/docs/output-formats/html-themes.html
+    highlight-style: a11y   #-
+    css: my_styles.css      #- si queréis añadir cosas
+    page-layout: full
+    toc: true
+    code-copy: true
+    code-overflow: wrap    
+    code-fold: show
+    code-line-numbers: true
+
+# Enable CC licence appendix
+#license: "CC BY"
+
+lang: es  
+
+# Default execute options
+execute:
+  #freeze: true  #- des-comentar cuando estéis tuneando el blog
+  echo: true
+  message: false
+  warning: false
+  eval: true
+
+#- Default knitr options
+knitr:
+  opts_chunk: 
+    collapse: true
+    comment: "#>" 
+    fig.asp:  7/9
+    out.width: "95%"
+    fig.align: "center"
+    fig.show: "hold"
+    R.options:
+      options(scipen = 999) #- para quitar la notación científica  
